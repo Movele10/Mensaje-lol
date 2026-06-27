@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Mensaje</title>
 
 <style>
+
 *{
   margin:0;
   padding:0;
@@ -16,14 +18,16 @@ body{
   background:#0b0b0b;
   color:#d8f3dc;
   font-family:"Courier New", monospace;
-  padding:20px;
   min-height:100vh;
+  padding:20px;
   overflow-x:hidden;
+  position:relative;
+  animation:flicker 6s infinite;
 }
 
 #text{
-  max-width:650px;
-  margin:auto;
+  max-width:850px;
+  margin:0 auto;
   white-space:pre-wrap;
   word-wrap:break-word;
   font-size:24px;
@@ -38,7 +42,7 @@ body{
   margin-top:10px;
 }
 
-/* efecto leve */
+/* fondo glitch suave */
 body::before{
   content:"";
   position:fixed;
@@ -50,6 +54,12 @@ body::before{
   );
   pointer-events:none;
 }
+
+@keyframes flicker{
+  0%,100%{opacity:1;}
+  50%{opacity:0.98;}
+}
+
 </style>
 </head>
 
@@ -73,7 +83,7 @@ att, con todo el corazón, Evan`;
 
 let i = 0;
 let buffer = "";
-let pauseLove = false;
+let pauseBeforeLove = false;
 
 const box = document.getElementById("text");
 
@@ -90,21 +100,23 @@ function type(){
 
   render(buffer);
 
-  // 🔥 PAUSA ANTES DE "Me gustas."
-  if(message.slice(i).startsWith("Me gustas.") && !pauseLove){
-    pauseLove = true;
+  const nextText = message.slice(i);
+
+  // 💚 pausa antes de "Me gustas."
+  if(nextText.startsWith("Me gustas.") && !pauseBeforeLove){
+    pauseBeforeLove = true;
     setTimeout(type, 2000);
     return;
   }
 
-  // ⌨️ velocidad según carácter
+  // ⌨️ velocidad por carácter
   let delay = 35;
 
   if(char === ".") delay = 900;
   else if(char === ",") delay = 250;
 
-  // 📜 auto scroll SOLO al final (85%)
-  if(i > message.length * 0.85){
+  // 📜 AUTO SCROLL MÁS TARDE (90%)
+  if(i > message.length * 0.9){
     window.scrollTo({
       top: document.body.scrollHeight,
       behavior: "smooth"
