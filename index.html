@@ -1,50 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Mensaje</title>
 
 <style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
 body{
-  background:#0b0b0b;
-  color:#d8f3dc;
-  font-family:"Courier New", monospace;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  min-height:100vh;
-  padding:40px;
+    background:#0b0b0b;
+    color:#d8f3dc;
+    font-family:"Courier New", monospace;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:25px;
+    overflow-y:auto;
+    position:relative;
+    animation:flicker 6s infinite;
 }
 
 #text{
-  max-width:750px;
-  font-size:16px;
-  line-height:1.6;
-  white-space:pre-wrap;
+    width:100%;
+    max-width:750px;
+    white-space:pre-wrap;
+    word-wrap:break-word;
+    font-size:17px;
+    line-height:1.8;
+    border-right:2px solid #d8f3dc;
+    text-shadow:0 0 2px rgba(255,255,255,.2);
 }
 
 .highlight{
-  color:orange;
-  font-weight:bold;
-  display:block;
-  margin-top:10px;
+    color:orange;
+    font-weight:bold;
+    display:block;
+    margin:10px 0;
 }
 
 body::before{
-  content:"";
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(255,255,255,0.02),
-    rgba(0,0,0,0.02) 2px
-  );
-  pointer-events:none;
+    content:"";
+    position:fixed;
+    inset:0;
+    background:repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,.02),
+        rgba(0,0,0,.02) 2px
+    );
+    pointer-events:none;
 }
+
+@keyframes flicker{
+    0%,100%{opacity:1;}
+    50%{opacity:.98;}
+}
+
 </style>
+
 </head>
 
 <body>
@@ -55,63 +75,87 @@ body::before{
 
 const message = `Hola, Elizabeth.
 
-Supongo que fue difícil, o tal vez fácil, o quién sabe si fastidioso...
+Supongo que fue fácil, o tal vez difícil, o quién sabe si fastidioso...
 
-Me demoré en hacerlo, pero valió la pena.
+La verdad, me demoré tres días haciendo esta decodificación porque tomó bastante tiempo, pero siento que valió la pena.
 
 Me gustas.
 
-No espero respuesta, solo quería decirlo.
+No espero un sí ni un no; solo quería sacarme esta espina del corazón.
 
-att, Evan`;
+att, con todo el corazón, Evan`;
 
 let i = 0;
 let buffer = "";
+let pauseBeforeLove = false;
 
 function type(){
 
-  if(i >= message.length){
+    if(i >= message.length){
+        render(buffer);
+        return;
+    }
+
+    const char = message.charAt(i);
+
+    buffer += char;
+    i++;
+
     render(buffer);
-    return;
-  }
 
-  buffer += message[i];
-  i++;
+    window.scrollTo({
+        top:document.body.scrollHeight,
+        behavior:"smooth"
+    });
 
-  render(buffer);
+    const nextText = message.slice(i);
 
-  const char = message[i-1];
+    if(nextText.startsWith("Me gustas.") && !pauseBeforeLove){
+        pauseBeforeLove = true;
+        setTimeout(type,2000);
+        return;
+    }
 
-  if(char === "."){
-    setTimeout(type, 600);
-  }
-  else if(char === ","){
-    setTimeout(type, 200);
-  }
-  else{
-    setTimeout(type, 25);
-  }
+    if(char === "."){
+        setTimeout(type,1000);
+    }
+    else if(char === ","){
+        setTimeout(type,300);
+    }
+    else{
+        setTimeout(type,45);
+    }
+
 }
 
 function render(text){
 
-  const marker = "Me gustas.";
+    const marker = "Me gustas.";
 
-  const el = document.getElementById("text");
+    const box = document.getElementById("text");
 
-  if(text.includes(marker)){
-    const parts = text.split(marker);
+    if(text.includes(marker)){
 
-    el.innerHTML =
-      parts[0] +
-      `<div class="highlight">${marker}</div>` +
-      (parts[1] || "");
-  } else {
-    el.textContent = text; // 👈 CLAVE (NO innerHTML)
-  }
+        const parts = text.split(marker);
+
+        box.innerHTML =
+            parts[0] +
+            `<div class="highlight">${marker}</div>` +
+            (parts[1] || "");
+
+    }else{
+
+        box.textContent = text;
+
+    }
+
 }
 
-type();
+window.onload = () => {
+
+    setTimeout(type,300);
+
+};
 
 </script>
 
