@@ -1,67 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Mensaje</title>
 
 <style>
-
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
 body{
-    background:#0b0b0b;
-    color:#d8f3dc;
-    font-family:"Courier New", monospace;
-    padding:18px;
-    min-height:100vh;
-    overflow-y:auto;
-    position:relative;
-    animation:flicker 6s infinite;
+  background:#0b0b0b;
+  color:#d8f3dc;
+  font-family:"Courier New", monospace;
+  padding:20px;
+  min-height:100vh;
+  overflow-x:hidden;
 }
 
 #text{
-    width:100%;
-    max-width:850px;
-    margin:0 auto;
-    white-space:pre-wrap;
-    word-wrap:break-word;
-    font-size:23px;
-    line-height:1.8;
-    border-right:3px solid #d8f3dc;
-    text-shadow:0 0 2px rgba(255,255,255,.2);
+  max-width:650px;
+  margin:auto;
+  white-space:pre-wrap;
+  word-wrap:break-word;
+  font-size:24px;
+  line-height:1.8;
+  border-right:2px solid #d8f3dc;
 }
 
 .highlight{
-    color:orange;
-    font-weight:bold;
+  color:orange;
+  font-weight:bold;
+  display:block;
+  margin-top:10px;
 }
 
+/* efecto leve */
 body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    background:repeating-linear-gradient(
-        0deg,
-        rgba(255,255,255,.02),
-        rgba(0,0,0,.02) 2px
-    );
-    pointer-events:none;
+  content:"";
+  position:fixed;
+  inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.02),
+    rgba(0,0,0,0.02) 2px
+  );
+  pointer-events:none;
 }
-
-@keyframes flicker{
-    0%,100%{opacity:1;}
-    50%{opacity:.98;}
-}
-
 </style>
-
 </head>
 
 <body>
@@ -82,64 +71,68 @@ No espero un sí ni un no; solo quería sacarme esta espina del corazón.
 
 att, con todo el corazón, Evan`;
 
+let i = 0;
+let buffer = "";
+let pauseLove = false;
+
 const box = document.getElementById("text");
 
-let i = 0;
-let pause = false;
+function type(){
 
-function escribir(){
+  if(i >= message.length){
+    render(buffer);
+    return;
+  }
 
-    if(i >= message.length){
-        return;
-    }
+  const char = message[i];
+  buffer += char;
+  i++;
 
-    const siguiente = message.slice(i);
+  render(buffer);
 
-    if(siguiente.startsWith("Me gustas.") && !pause){
+  // 🔥 PAUSA ANTES DE "Me gustas."
+  if(message.slice(i).startsWith("Me gustas.") && !pauseLove){
+    pauseLove = true;
+    setTimeout(type, 2000);
+    return;
+  }
 
-        pause = true;
+  // ⌨️ velocidad según carácter
+  let delay = 35;
 
-        setTimeout(escribir,2000);
+  if(char === ".") delay = 900;
+  else if(char === ",") delay = 250;
 
-        return;
+  // 📜 auto scroll SOLO al final (85%)
+  if(i > message.length * 0.85){
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    });
+  }
 
-    }
-
-    if(siguiente.startsWith("Me gustas.")){
-
-        box.innerHTML += `<span class="highlight">Me gustas.</span>`;
-
-        i += "Me gustas.".length;
-
-        setTimeout(escribir,1000);
-
-        return;
-
-    }
-
-    box.innerHTML += message.charAt(i);
-
-    window.scrollTo(0,document.body.scrollHeight);
-
-    const c = message.charAt(i);
-
-    i++;
-
-    if(c==="."){
-        setTimeout(escribir,900);
-    }
-    else if(c===","){
-        setTimeout(escribir,250);
-    }
-    else{
-        setTimeout(escribir,40);
-    }
-
+  setTimeout(type, delay);
 }
 
-window.onload=()=>{
-    escribir();
+function render(text){
+
+  const marker = "Me gustas.";
+
+  if(text.includes(marker)){
+    const parts = text.split(marker);
+
+    box.innerHTML =
+      parts[0] +
+      `<div class="highlight">${marker}</div>` +
+      (parts[1] || "");
+  } else {
+    box.textContent = text;
+  }
 }
+
+window.onload = () => {
+  type();
+};
 
 </script>
 
