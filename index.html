@@ -3,18 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <title>Mensaje</title>
+
+<style>
+body{
+  background:#0b0b0b;
+  color:#d8f3dc;
+  font-family:"Courier New", monospace;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  height:100vh;
+  padding:40px;
+  overflow:hidden;
+}
+
+#text{
+  max-width:750px;
+  white-space:pre-wrap;
+  border-right:2px solid #d8f3dc;
+  font-size:16px;
+  line-height:1.6;
+  text-shadow:0 0 2px rgba(255,255,255,0.2);
+}
+
+.highlight{
+  color:orange;
+  font-weight:bold;
+  display:block;
+  margin-top:10px;
+}
+
+body::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.02),
+    rgba(0,0,0,0.02) 2px
+  );
+  pointer-events:none;
+}
+
+body{
+  animation:flicker 6s infinite;
+}
+
+@keyframes flicker{
+  0%,100%{opacity:1;}
+  50%{opacity:0.98;}
+}
+</style>
 </head>
-<body style="background:black;color:#00ff99;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh;text-align:center;padding:20px">
 
-<div>
+<body>
 
-<h1>💌 Hola, Elizabeth</h1>
+<div id="text"></div>
 
-<p>
-Hola, Elizabeth. Supongo que fue difícil descifrar este texto, pero fue porque todavía me siento un poco asustado y nervioso por decir esto. La verdad, me demoré tres días haciendo esta decodificación porque tomó bastante tiempo, pero siento que valió la pena. Me gustas. No espero un sí ni un no; solo quería sacarme esta espina del corazón.
-</p>
+<script>
 
-</div>
+const message = `Hola, Elizabeth.
+
+Supongo que fue fácil, o tal vez difícil, o quién sabe si fastidioso...
+
+La verdad, me demoré tres días haciendo esta decodificación porque tomó bastante tiempo, pero siento que valió la pena.
+
+Me gustas.
+
+No espero un sí ni un no; solo quería sacarme esta espina del corazón.
+
+att, con todo el corazón, Evan`;
+
+let i = 0;
+let buffer = "";
+let pauseBeforeLove = false;
+
+function type(){
+  if(i >= message.length){
+    render(buffer);
+    return;
+  }
+
+  const char = message.charAt(i);
+  buffer += char;
+  i++;
+
+  render(buffer);
+
+  // 🔥 AUTO SCROLL SUAVE
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
+  });
+
+  const nextText = message.slice(i);
+
+  if(nextText.startsWith("Me gustas.") && !pauseBeforeLove){
+    pauseBeforeLove = true;
+    setTimeout(type, 2000);
+    return;
+  }
+
+  if(char === "."){
+    setTimeout(type, 1000);
+  } 
+  else if(char === ","){
+    setTimeout(type, 300);
+  } 
+  else {
+    setTimeout(type, 45);
+  }
+}
+
+function render(text){
+
+  const marker = "Me gustas.";
+
+  if(text.includes(marker)){
+    let parts = text.split(marker);
+
+    document.getElementById("text").innerHTML = `
+      ${parts[0]}
+      <div class="highlight">${marker}</div>
+      ${parts[1] || ""}
+    `;
+  } else {
+    document.getElementById("text").innerHTML = text;
+  }
+}
+
+type();
+
+</script>
 
 </body>
-</html>
+  </html>
