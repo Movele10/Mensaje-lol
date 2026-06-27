@@ -12,18 +12,15 @@ body{
   display:flex;
   justify-content:center;
   align-items:flex-start;
-  height:100vh;
+  min-height:100vh;
   padding:40px;
-  overflow:hidden;
 }
 
 #text{
   max-width:750px;
-  white-space:pre-wrap;
-  border-right:2px solid #d8f3dc;
   font-size:16px;
   line-height:1.6;
-  text-shadow:0 0 2px rgba(255,255,255,0.2);
+  white-space:pre-wrap;
 }
 
 .highlight{
@@ -35,7 +32,7 @@ body{
 
 body::before{
   content:"";
-  position:absolute;
+  position:fixed;
   top:0;
   left:0;
   width:100%;
@@ -46,15 +43,6 @@ body::before{
     rgba(0,0,0,0.02) 2px
   );
   pointer-events:none;
-}
-
-body{
-  animation:flicker 6s infinite;
-}
-
-@keyframes flicker{
-  0%,100%{opacity:1;}
-  50%{opacity:0.98;}
 }
 </style>
 </head>
@@ -67,54 +55,41 @@ body{
 
 const message = `Hola, Elizabeth.
 
-Supongo que fue fácil, o tal vez difícil, o quién sabe si fastidioso...
+Supongo que fue difícil, o tal vez fácil, o quién sabe si fastidioso...
 
-La verdad, me demoré tres días haciendo esta decodificación porque tomó bastante tiempo, pero siento que valió la pena.
+Me demoré en hacerlo, pero valió la pena.
 
 Me gustas.
 
-No espero un sí ni un no; solo quería sacarme esta espina del corazón.
+No espero respuesta, solo quería decirlo.
 
-att, con todo el corazón, Evan`;
+att, Evan`;
 
 let i = 0;
 let buffer = "";
-let pauseBeforeLove = false;
 
 function type(){
+
   if(i >= message.length){
     render(buffer);
     return;
   }
 
-  const char = message.charAt(i);
-  buffer += char;
+  buffer += message[i];
   i++;
 
   render(buffer);
 
-  // 🔥 AUTO SCROLL SUAVE
-  window.scrollTo({
-    top: document.body.scrollHeight,
-    behavior: "smooth"
-  });
-
-  const nextText = message.slice(i);
-
-  if(nextText.startsWith("Me gustas.") && !pauseBeforeLove){
-    pauseBeforeLove = true;
-    setTimeout(type, 2000);
-    return;
-  }
+  const char = message[i-1];
 
   if(char === "."){
-    setTimeout(type, 1000);
-  } 
+    setTimeout(type, 600);
+  }
   else if(char === ","){
-    setTimeout(type, 300);
-  } 
-  else {
-    setTimeout(type, 45);
+    setTimeout(type, 200);
+  }
+  else{
+    setTimeout(type, 25);
   }
 }
 
@@ -122,16 +97,17 @@ function render(text){
 
   const marker = "Me gustas.";
 
-  if(text.includes(marker)){
-    let parts = text.split(marker);
+  const el = document.getElementById("text");
 
-    document.getElementById("text").innerHTML = `
-      ${parts[0]}
-      <div class="highlight">${marker}</div>
-      ${parts[1] || ""}
-    `;
+  if(text.includes(marker)){
+    const parts = text.split(marker);
+
+    el.innerHTML =
+      parts[0] +
+      `<div class="highlight">${marker}</div>` +
+      (parts[1] || "");
   } else {
-    document.getElementById("text").innerHTML = text;
+    el.textContent = text; // 👈 CLAVE (NO innerHTML)
   }
 }
 
@@ -140,4 +116,4 @@ type();
 </script>
 
 </body>
-  </html>
+</html>
