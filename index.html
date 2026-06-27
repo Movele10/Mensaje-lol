@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -18,11 +19,8 @@ body{
     background:#0b0b0b;
     color:#d8f3dc;
     font-family:"Courier New", monospace;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
+    padding:18px;
     min-height:100vh;
-    padding:25px;
     overflow-y:auto;
     position:relative;
     animation:flicker 6s infinite;
@@ -30,20 +28,19 @@ body{
 
 #text{
     width:100%;
-    max-width:750px;
+    max-width:850px;
+    margin:0 auto;
     white-space:pre-wrap;
     word-wrap:break-word;
-    font-size:17px;
+    font-size:23px;
     line-height:1.8;
-    border-right:2px solid #d8f3dc;
+    border-right:3px solid #d8f3dc;
     text-shadow:0 0 2px rgba(255,255,255,.2);
 }
 
 .highlight{
     color:orange;
     font-weight:bold;
-    display:block;
-    margin:10px 0;
 }
 
 body::before{
@@ -85,77 +82,64 @@ No espero un sí ni un no; solo quería sacarme esta espina del corazón.
 
 att, con todo el corazón, Evan`;
 
-let i = 0;
-let buffer = "";
-let pauseBeforeLove = false;
+const box = document.getElementById("text");
 
-function type(){
+let i = 0;
+let pause = false;
+
+function escribir(){
 
     if(i >= message.length){
-        render(buffer);
         return;
     }
 
-    const char = message.charAt(i);
+    const siguiente = message.slice(i);
 
-    buffer += char;
+    if(siguiente.startsWith("Me gustas.") && !pause){
+
+        pause = true;
+
+        setTimeout(escribir,2000);
+
+        return;
+
+    }
+
+    if(siguiente.startsWith("Me gustas.")){
+
+        box.innerHTML += `<span class="highlight">Me gustas.</span>`;
+
+        i += "Me gustas.".length;
+
+        setTimeout(escribir,1000);
+
+        return;
+
+    }
+
+    box.innerHTML += message.charAt(i);
+
+    window.scrollTo(0,document.body.scrollHeight);
+
+    const c = message.charAt(i);
+
     i++;
 
-    render(buffer);
-
-    window.scrollTo({
-        top:document.body.scrollHeight,
-        behavior:"smooth"
-    });
-
-    const nextText = message.slice(i);
-
-    if(nextText.startsWith("Me gustas.") && !pauseBeforeLove){
-        pauseBeforeLove = true;
-        setTimeout(type,2000);
-        return;
+    if(c==="."){
+        setTimeout(escribir,900);
     }
-
-    if(char === "."){
-        setTimeout(type,1000);
-    }
-    else if(char === ","){
-        setTimeout(type,300);
+    else if(c===","){
+        setTimeout(escribir,250);
     }
     else{
-        setTimeout(type,45);
+        setTimeout(escribir,40);
     }
 
 }
 
-function render(text){
-
-    const marker = "Me gustas.";
-
-    const box = document.getElementById("text");
-
-    if(text.includes(marker)){
-
-        const parts = text.split(marker);
-
-        box.innerHTML =
-            parts[0] +
-            `<div class="highlight">${marker}</div>` +
-            (parts[1] || "");
-
-    }else{
-
-        box.textContent = text;
-
-    }
-
+window.onload=()=>{
+    escribir();
 }
-
-window.onload = () => {
-
-    setTimeout(type,300);
-
-};
 
 </script>
 
